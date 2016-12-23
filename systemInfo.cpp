@@ -15,7 +15,7 @@ __int64 CompareFileTime(FILETIME preTime, FILETIME nowTime)
 	return Filetime2Int64(&nowTime) - Filetime2Int64(&preTime);
 }
 
-//½«µ¥×Ö½Úchar*×ª»¯Îª¿í×Ö½Úwchar_t*    
+//å°†å•å­—èŠ‚char*è½¬åŒ–ä¸ºå®½å­—èŠ‚wchar_t*    
 wchar_t* AnsiToUnicode(const char* szStr)
 {
 	int nLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szStr, -1, NULL, 0);
@@ -28,7 +28,7 @@ wchar_t* AnsiToUnicode(const char* szStr)
 	return pResult;
 }
 
-//½«¿í×Ö½Úwchar_t*×ª»¯Îªµ¥×Ö½Úchar*    
+//å°†å®½å­—èŠ‚wchar_t*è½¬åŒ–ä¸ºå•å­—èŠ‚char*    
 inline char* UnicodeToAnsi(const wchar_t* szStr)
 {
 	int nLen = WideCharToMultiByte(CP_ACP, 0, szStr, -1, NULL, 0, NULL, NULL);
@@ -59,9 +59,9 @@ bool GetSysCpu(int& nCpuRate)
 	preKernelTime = kernelTime;
 	preUserTime = userTime;
 
-	hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);//³õÊ¼ÖµÎªnonsignaled  
+	hEvent = CreateEvent(NULL, FALSE, FALSE, NULL);//åˆå§‹å€¼ä¸ºnonsignaled  
 
-	WaitForSingleObject(hEvent, 200);//µÈ´ı500ºÁÃë  
+	WaitForSingleObject(hEvent, 200);//ç­‰å¾…500æ¯«ç§’  
 
 	res = GetSystemTimes(&idleTime, &kernelTime, &userTime);
 
@@ -78,7 +78,7 @@ bool GetSysMemory(int& nMemTotal, int& nMemUsed)
 {
 	MEMORYSTATUSEX memsStat;
 	memsStat.dwLength = sizeof(memsStat);
-	if (!GlobalMemoryStatusEx(&memsStat))//Èç¹û»ñÈ¡ÏµÍ³ÄÚ´æĞÅÏ¢²»³É¹¦£¬¾ÍÖ±½Ó·µ»Ø  
+	if (!GlobalMemoryStatusEx(&memsStat))//å¦‚æœè·å–ç³»ç»Ÿå†…å­˜ä¿¡æ¯ä¸æˆåŠŸï¼Œå°±ç›´æ¥è¿”å›  
 	{
 		nMemTotal = -1;
 		nMemUsed = -1;
@@ -92,11 +92,11 @@ bool GetSysMemory(int& nMemTotal, int& nMemUsed)
 
 bool GetSysDisk(int& nDiskTotal, int& nDiskUsed)
 {
-	static char path[_MAX_PATH];//´æ´¢µ±Ç°ÏµÍ³´æÔÚµÄÅÌ·û  
+	static char path[_MAX_PATH];//å­˜å‚¨å½“å‰ç³»ç»Ÿå­˜åœ¨çš„ç›˜ç¬¦  
 	int curdrive = _getdrive();
 	unsigned long lFreeAll = 0UL;
 	unsigned long lTotalAll = 0UL;
-	for (int drive = 1; drive <= 26; drive++)//±éÀúËùÓĞÅÌ·û  
+	for (int drive = 1; drive <= 26; drive++)//éå†æ‰€æœ‰ç›˜ç¬¦  
 	{
 		if (!_chdrive(drive))
 		{
@@ -122,41 +122,41 @@ bool GetSysDisk(int& nDiskTotal, int& nDiskUsed)
 
 list<vector<string>> GetAllProcess()
 {
-	HANDLE hProcessSnap;    //½ø³Ì¿ìÕÕµÄ¾ä±ú  
-	HANDLE hProcess;    //ÓÃÓÚ»ñÈ¡½ø³ÌµÄ¾ä±ú  
-	PROCESSENTRY32 pe32;//½ø³ÌĞÅÏ¢µÄ½á¹¹Ìå  
-	list<vector<string>> pidMap;//±£´æËùÓĞ½ø³ÌµÄPID ,Ãû×ÖºÍÕ¼ÓÃÄÚ´æ 
+	HANDLE hProcessSnap;    //è¿›ç¨‹å¿«ç…§çš„å¥æŸ„  
+	HANDLE hProcess;    //ç”¨äºè·å–è¿›ç¨‹çš„å¥æŸ„  
+	PROCESSENTRY32 pe32;//è¿›ç¨‹ä¿¡æ¯çš„ç»“æ„ä½“  
+	list<vector<string>> pidMap;//ä¿å­˜æ‰€æœ‰è¿›ç¨‹çš„PID ,åå­—å’Œå ç”¨å†…å­˜ 
 							 
-    // »ñÈ¡ÏµÍ³½ø³ÌĞÅÏ¢µÄ¿ìÕÕ  
+    // è·å–ç³»ç»Ÿè¿›ç¨‹ä¿¡æ¯çš„å¿«ç…§  
 	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
 	{
 		if (NULL != hProcessSnap)
 		{
-			CloseHandle(hProcessSnap);          // ¹Ø±Õ½ø³Ì¿ìÕÕĞÅÏ¢  
+			CloseHandle(hProcessSnap);          // å…³é—­è¿›ç¨‹å¿«ç…§ä¿¡æ¯  
 			hProcessSnap = NULL;
 		}
 		return pidMap;
 	}
 
-	// ÔÚÊ¹ÓÃÖ®Ç°ÉèÖÃPROCESSENTRY32½á¹¹ÌåµÄ³õÊ¼´óĞ¡Öµ,Èç¹û²»³õÊ¼»¯dwSize, Process32First µ÷ÓÃ»áÊ§°Ü.  
+	// åœ¨ä½¿ç”¨ä¹‹å‰è®¾ç½®PROCESSENTRY32ç»“æ„ä½“çš„åˆå§‹å¤§å°å€¼,å¦‚æœä¸åˆå§‹åŒ–dwSize, Process32First è°ƒç”¨ä¼šå¤±è´¥.  
 	pe32.dwSize = sizeof(PROCESSENTRY32);
-	if (!Process32First(hProcessSnap, &pe32))// ¿ªÊ¼»ñÈ¡µÚÒ»¸ö½ø³ÌµÄĞÅÏ¢£¬Èç¹û»ñÈ¡Ê§°Ü¾Í·µ»Ø  
+	if (!Process32First(hProcessSnap, &pe32))// å¼€å§‹è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯ï¼Œå¦‚æœè·å–å¤±è´¥å°±è¿”å›  
 	{
 		if (NULL != hProcessSnap)
 		{
-			CloseHandle(hProcessSnap);          // ¹Ø±Õ½ø³Ì¿ìÕÕĞÅÏ¢  
+			CloseHandle(hProcessSnap);          // å…³é—­è¿›ç¨‹å¿«ç…§ä¿¡æ¯  
 			hProcessSnap = NULL;
 		}
 		return pidMap;
 	}
 
-	//¿ªÊ¼±éÀúËùÓĞ½ø³Ì  
+	//å¼€å§‹éå†æ‰€æœ‰è¿›ç¨‹  
 	do
 	{
 		vector<string> oneProcess;
 
-		//¼ÓÈëÃû×Ö£¬PID  £¬Õ¼µÄÄÚ´æ
+		//åŠ å…¥åå­—ï¼ŒPID  ï¼Œå çš„å†…å­˜
 		string strProcessName = UnicodeToAnsi(pe32.szExeFile);
 		oneProcess.push_back(strProcessName);
 
@@ -173,10 +173,15 @@ list<vector<string>> GetAllProcess()
 		strmem += "%";
 		oneProcess.push_back(strmem);
 
-		pidMap.push_back(oneProcess);
-	} while (Process32Next(hProcessSnap, &pe32));// »ñÈ¡ÏÂÒ»¸ö½ø³ÌµÄĞÅÏ¢  
+		int fatherID = static_cast<int>(pe32.th32ParentProcessID);
+		string fath;
+		ss << fatherID; ss >> fath; ss.clear();
+		oneProcess.push_back(fath);
 
-	if (NULL != hProcessSnap)//×îºó¹Ø±Õ¿ìÕÕ¾ä±ú  
+		pidMap.push_back(oneProcess);
+	} while (Process32Next(hProcessSnap, &pe32));// è·å–ä¸‹ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯  
+
+	if (NULL != hProcessSnap)//æœ€åå…³é—­å¿«ç…§å¥æŸ„  
 	{
 		CloseHandle(hProcessSnap);
 		hProcessSnap = NULL;
@@ -186,9 +191,9 @@ list<vector<string>> GetAllProcess()
 
 bool GetProcessMemory(int nPid, int &nProcessMemRate)
 {
-	HANDLE hProcess;//¸ÃÏß³ÌµÄ¾ä±ú  
-	PROCESS_MEMORY_COUNTERS pmc;//¸ÃÏß³ÌµÄÄÚ´æĞÅÏ¢½á¹¹Ìå  
-	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, nPid);//ÀûÓÃ×î´óÈ¨ÏŞ´ò¿ª¸ÃÏß³Ì²¢»ñµÃ¾ä±ú  
+	HANDLE hProcess;//è¯¥çº¿ç¨‹çš„å¥æŸ„  
+	PROCESS_MEMORY_COUNTERS pmc;//è¯¥çº¿ç¨‹çš„å†…å­˜ä¿¡æ¯ç»“æ„ä½“  
+	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, nPid);//åˆ©ç”¨æœ€å¤§æƒé™æ‰“å¼€è¯¥çº¿ç¨‹å¹¶è·å¾—å¥æŸ„  
 	if (nullptr == hProcess){ return false; }
 	if (!GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))){ return false; }
 
